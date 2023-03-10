@@ -15,21 +15,22 @@ import java.time.Instant;
 @Tag(name = "Book REST endpoint")
 public class BookResource {
 
+  @Inject
   @RestClient
   NumberProxy proxy;
+
+  @Inject
+  Logger logger;
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-  @Operation(
-    summary = "Creates a Book",
-    description = "Creates a Book with an ISBN number"
-  )
-  public Response createBook(
-      @FormParam("title") String title,
-      @FormParam("author") String author, 
-      @FormParam("year") int yearOfPublication, 
-      @FormParam("genre") String genre) {
+  @Operation(summary = "Creates a new book")
+  public Response createABook(
+          @FormParam("title") String title,
+          @FormParam("author") String author,
+          @FormParam("year") int yearOfPublication,
+          @FormParam("genre") String genre) {
     Book book = new Book();
     book.isbn13 = proxy.generateIsbnNumbers().isbn13;
     book.title = title;
@@ -37,6 +38,7 @@ public class BookResource {
     book.yearOfPublication = yearOfPublication;
     book.genre = genre;
     book.creationDate = Instant.now();
+    logger.info("Book created: " + book);
     return Response.status(201).entity(book).build();
   }
 
